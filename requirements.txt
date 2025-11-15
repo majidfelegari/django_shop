@@ -1,6 +1,6 @@
 # main modules
-django >4.2,<4.3
+django>4.2,<4.3
 
 
 # database modules
-psycopg[binaty]
+psycopg[binary]
