@@ -162,3 +162,4 @@ if SHOW_DEBUGGER_TOOLBAR:
 
 # config user model
 AUTH_USER_MODEL = 'accounts.User'
+LOGIN_REDIRECT_URL = "/"

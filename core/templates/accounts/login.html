@@ -12,8 +12,8 @@
         <!-- End Heading -->
 
         <!-- Form -->
-        <form action="{ url 'accounts:lognin'}" method="post">
-            {% csrf_token %}
+        <form action="{% url 'accounts:login' %}" method="post">
+          {% csrf_token %}
           <!-- Form -->
           <div class="mb-4">
             <label class="form-label" for="signupSimpleLoginEmail">ایمیل شما</label>
@@ -57,3 +57,4 @@
     </div>
     <!-- End Form -->
 {% endblock content %}
+
