@@ -1,5 +1,5 @@
 from django.db import models
-
+from decimal import Decimal
 class ProductStatusType(models.IntegerChoices):
     publish = 1, ("نمایش")
     draft = 2, ("عدم نمایش")
@@ -39,6 +39,10 @@ class ProductModel(models.Model):
     def __str__(self):
         return self.title
 
+    def get_show_price(self):
+        discount_amount = self.price * Decimal((self.discount_percent / 100))
+        discount_amount = self.price - discount_amount
+        return '{:,}'.format(round(discount_amount))
 
 class ProductImageModel(models.Model):
     product = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
