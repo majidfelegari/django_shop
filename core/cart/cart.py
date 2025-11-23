@@ -8,6 +8,15 @@ class CartSession:
                                          "items":[],
                                      })
         
+    
+    def update_product_quantity(self, product_id, quantity):
+        for item in self._cart["items"]:
+            if product_id == item["product_id"]:
+                item["quantity"] = int(quantity)
+                break
+        else:
+            return
+        self.save()
 
     def add_product(self,product_id):
         for item in self._cart["items"]:
@@ -20,6 +29,15 @@ class CartSession:
                 "quantity":1,
             }
             self._cart["items"].append(new_item)
+        self.save()
+
+    def remove_product(self, product_id):
+        for item in self._cart["items"]:
+            if product_id == item["product_id"]:
+                self._cart["items"].remove(item)
+                break
+        else:
+            return
         self.save()
 
     def clear(self):
