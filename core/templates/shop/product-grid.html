@@ -204,7 +204,17 @@
                   <h4 class="card-title">
                     <a class="text-dark" href="{% url 'shop:product-detail' slug=object.slug%}">{{object.title}}</a>
                   </h4>
-                  <p class="card-text text-dark">{{object.get_show_price}}تومان </p>
+                  {% if object.is_discounted %}
+                    <div class="d-flex align-items-center">
+                      <h3 class="mb-0 formatted-price">{{object.get_price}}  </h3>
+                      <span class="me-2 formatted-price text-decoration-line-through">{{object.price}} </span>
+                    </div>
+                  {% else %}
+                    <div class="d-flex align-items-center">
+                      <h3 class="mb-0 formatted-price">{{object.price}} تومان </h3>
+                    </div>
+                    
+                  {% endif %}
                 </div>
 
                 <div class="card-footer pt-0">
