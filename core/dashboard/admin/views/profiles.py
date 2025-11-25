@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import View,TemplateView, UpdateView
+from django.views.generic import  UpdateView
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -13,9 +13,6 @@ from accounts.models import Profile
 from django.shortcuts import redirect
 from django.contrib import messages
 # Create your views here.
-
-class AdminDashboardHomeView(LoginRequiredMixin,HasAdminAccessPermission, TemplateView):
-    template_name = "dashboard/admin/home.html"
 
 
 class AdminSecurityEditView(LoginRequiredMixin,HasAdminAccessPermission,SuccessMessageMixin, auth_views.PasswordChangeView):
