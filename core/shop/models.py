@@ -1,6 +1,7 @@
 from django.db import models
 from decimal import Decimal
 from django.core.validators import MaxValueValidator, MinValueValidator
+
 class ProductStatusType(models.IntegerChoices):
     publish = 1, ("نمایش")
     draft = 2, ("عدم نمایش")
@@ -51,6 +52,9 @@ class ProductModel(models.Model):
 
     def is_discounted(self):
         return self.discount_percent != 0
+    
+    def is_published(self):
+        return self.status == ProductStatusType.publish.value
 
 class ProductImageModel(models.Model):
     product = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
