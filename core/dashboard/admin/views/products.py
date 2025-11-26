@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import  ListView, UpdateView
+from django.views.generic import  ListView, UpdateView, DeleteView
 from django.shortcuts import redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -61,3 +61,9 @@ class AdminProductEditView(LoginRequiredMixin, HasAdminAccessPermission, UpdateV
 
     def get_success_url(self):
         return reverse_lazy("dashboard:admin:product-edit", kwargs={"pk": self.get_object().pk})
+
+class AdminProductDeleteView(LoginRequiredMixin, HasAdminAccessPermission, DeleteView):
+    template_name = "dashboard/admin/products/product-delete.html"
+    queryset = ProductModel.objects.all()
+    success_url = reverse_lazy("dashboard:admin:product-list")
+    success_message = "حذف محصول با موفقیت انجام شد."
