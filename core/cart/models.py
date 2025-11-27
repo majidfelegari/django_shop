@@ -6,6 +6,10 @@ class CartModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.user.email
+    
+
 
 class CartItemModel(models.Model):
     cart = models.ForeignKey(CartModel,on_delete=models.CASCADE)
@@ -14,3 +18,7 @@ class CartItemModel(models.Model):
 
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.product.title} - {self.cart.id}"
+    
