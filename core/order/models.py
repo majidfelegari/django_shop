@@ -29,6 +29,8 @@ class CouponModel(models.Model):
     created_date = models.DateTimeField(null=True, blank=True)
     update_date = models.DateTimeField(null=True, blank=True)
 
+
+
 class OrderModel(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.PROTECT)
 
@@ -43,18 +45,24 @@ class OrderModel(models.Model):
 
     status = models.IntegerField(choices=OrderStatusType.choices, default=OrderStatusType.pending.value)
 
-    created_date = models.DateTimeField(null=True, blank=True)
-    update_date = models.DateTimeField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
+
+    def calculate_total_price(self):
+        return sum(item.price * item.quantity for item in self.order_items.all())
+    
+    def __str__(self):
+        return f"{self.user.email} - {self.id}"
 
 class OrderItemModel(models.Model):
-    order = models.ForeignKey(OrderModel, on_delete=models.CASCADE)
+    order = models.ForeignKey(OrderModel, on_delete=models.CASCADE, related_name="order_items")
     product = models.ForeignKey('shop.ProductModel', on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField(default=0)
     price = models.DecimalField(default=0, max_digits=10, decimal_places=0)
 
-    created_date = models.DateTimeField(null=True, blank=True)
-    update_date = models.DateTimeField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.product.title} - {self.cart.id}"
+        return f"{self.product.title} - {self.order.id}"
     

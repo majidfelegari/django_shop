@@ -1,10 +1,11 @@
 from django.views.generic import TemplateView,FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from order.permissions import HasCustomerAccessPermission
-from order.models import UserAddressModel
+from order.models import UserAddressModel, OrderModel, OrderItemModel
 from order.forms import CheckOutForm
 from cart.models import CartModel
 from django.urls import reverse_lazy
+from cart.cart import CartSession
 # Create your views here.
 
 
@@ -22,7 +23,29 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         cleaned_data = form.cleaned_data
 
         address = cleaned_data['address_id']
+        cart = CartModel.objects.get(user = self.request.user)
+        cart_items = cart.cart_items.all()
+        order = OrderModel.objects.create(
+            user = self.request.user,
+            address = address.address,
+            state = address.state,
+            city = address.city,
+            zip_code = address.zip_code,
+        )
+        for item in cart_items:
+            OrderItemModel.objects.create(
+                order = order,
+                product = item.product,
+                quantity = item.quantity,
+                price = item.product.get_price(),
+            )
+        cart_items.delete()
+        CartSession(self.request.session).clear()
+        order.total_price = order.calculate_total_price()
+        order.save()
+
         return super().form_valid(form)
+        
     
     def form_invalid(self, form):
         return super().form_invalid(form)
