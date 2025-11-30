@@ -1,12 +1,14 @@
-from django.views.generic import TemplateView,FormView
+from django.views.generic import TemplateView,FormView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from order.permissions import HasCustomerAccessPermission
-from order.models import UserAddressModel, OrderModel, OrderItemModel
+from order.models import UserAddressModel, OrderModel, OrderItemModel, CouponModel
 from order.forms import CheckOutForm
 from cart.models import CartModel
 from django.urls import reverse_lazy
 from cart.cart import CartSession
 from decimal import Decimal
+from django.utils import timezone
+from django.http import JsonResponse
 # Create your views here.
 
 
@@ -73,3 +75,35 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
 class OrderCompletedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):
     template_name = "order/completed.html"
+
+class ValidateCouponView(LoginRequiredMixin, HasCustomerAccessPermission, View):
+    def post(self, request, *args, **kwargs):
+        code = request.POST.get("code")
+        user = self.request.user
+
+        status_code = 200
+        message = "کد تخفیف با موفقیت ثبت شد"
+        total_price = 0
+        total_tax = 0
+
+        try:
+            coupon = CouponModel.objects.get(code = code)
+        except CouponModel.DoesNotExist:
+            return JsonResponse({"message": "کد تخفیف یافت نشد"}, status = 404)
+        else:
+            if coupon.used_by.count() >= coupon.max_limit_usage:
+                status_code, message = 403, "محدودیت در تعداد استفاده"
+
+            elif coupon.expiration_date and coupon.expiration_date < timezone.now():
+                status_code, message = 403, "کد تخفیف منقضی شده"
+
+            elif user in coupon.used_by.all():
+                status_code, message = 403, "این کد تخفیف قبلا توسط شما استفاده شده"
+            
+            else:
+                cart = CartModel.objects.get(user = self.request.user)
+
+                total_price = cart.calculate_total_price()
+                total_price = round(total_price - (total_price * (coupon.discount_percent/100)))
+                total_tax = round((total_price * 9)/100)
+        return JsonResponse({ "message": message,"total_tax":total_tax,"total_price":total_price}, status= status_code)
