@@ -9,6 +9,9 @@ from cart.cart import CartSession
 from decimal import Decimal
 from django.utils import timezone
 from django.http import JsonResponse
+from payment.zarinpal_client import ZarinPalSandbox
+from django.shortcuts import redirect
+from payment.models import PaymentModel
 # Create your views here.
 
 
@@ -55,7 +58,18 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
         order.total_price = total_price
         order.save()
 
-        return super().form_valid(form)
+        return redirect(self.create_payment_url(order))
+    
+    def create_payment_url(self, order):
+        zarinpal = ZarinPalSandbox()
+        response = zarinpal.payment_request(order.total_price)
+        payment_obj = PaymentModel.objects.create(
+            authority_id = response.get("Authority"),
+            amount = order.total_price,
+        )
+        order.payment = payment_obj
+        order.save()
+        return zarinpal.generate_payment_url(response.get("Authority"))
         
     
     def form_invalid(self, form):
@@ -75,6 +89,10 @@ class OrderCheckOutView(LoginRequiredMixin, HasCustomerAccessPermission, FormVie
 
 class OrderCompletedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):
     template_name = "order/completed.html"
+
+    
+class OrderFailedView(LoginRequiredMixin, HasCustomerAccessPermission, TemplateView):
+    template_name = "order/failed.html"
 
 class ValidateCouponView(LoginRequiredMixin, HasCustomerAccessPermission, View):
     def post(self, request, *args, **kwargs):
