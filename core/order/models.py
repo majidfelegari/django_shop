@@ -78,6 +78,10 @@ class OrderModel(models.Model):
             return round(self.total_price - (self.total_price * Decimal( self.coupon.discount_percent /100)))
         else:
             return self.total_price
+        
+    @property
+    def is_successful(self):
+        return self.status == OrderStatusType.success.value
             
             
         
