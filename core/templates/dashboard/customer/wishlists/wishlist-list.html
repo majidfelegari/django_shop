@@ -60,12 +60,12 @@
               <div class="col-sm-3">
                 <div class="col-auto">
                   <div class="d-grid gap-2">
-                    {% comment %} <form action="{% url 'dashboard:customer:wishlist-delete' pk=object.pk %}" method="post">
-                      {% csrf_token %} {% endcomment %}
+                    <form action="{% url 'dashboard:customer:wishlist-delete' pk=object.pk %}" method="post">
+                      {% csrf_token %} 
                       <button class="btn btn-outline-danger btn-sm"  type="submit">
                         <i class="bi-trash me-1"></i> حذف
                       </button>
-                    {% comment %} </form> {% endcomment %}
+                    </form> 
                   </div>
                 </div>
                 <!-- End Col -->
