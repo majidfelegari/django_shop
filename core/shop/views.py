@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views import View
 from .models import ProductModel, ProductStatusType, ProductCategoryModel,WishlistProductModel
+from review.models import ReviewModel, ReviewStatusType
 from django.views.generic import (
     TemplateView,
     ListView,
@@ -56,8 +57,10 @@ class ShopProductDetailView(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        product = self.get_object()
         
         context["is_wished"] = WishlistProductModel.objects.filter(user = self.request.user).values_list('product__id', flat=True) if self.request.user.is_authenticated else False
+        context["reviews"] = ReviewModel.objects.filter(product= product, status = ReviewStatusType.accepted.value)
         
         return context
 

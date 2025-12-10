@@ -22,6 +22,9 @@ class ReviewModel(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.product.id}"
+    
+    class Meta:
+        ordering = ["-created_date"]
 
 @receiver(post_save, sender=ReviewModel)
 def calculate_avg_review(sender, instance, created, **kwargs):
